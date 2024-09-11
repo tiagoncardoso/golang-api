@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"github.com/tiagoncardoso/golang-api/internal/entity"
@@ -41,18 +41,26 @@ func (p *Product) FindAll(page, limit int, sort string) ([]entity.Product, error
 		sort = "asc"
 	}
 
-	if page != 0 {
+	if page == 0 {
 		page = 1
 	}
 
-	if limit != 0 {
+	if limit == 0 {
 		limit = 10
 	}
 
-	err := p.DB.Offset((page - 1) * limit).Limit(limit).Order("created_at" + sort).Find(&products).Error
+	err := p.DB.Offset((page - 1) * limit).Limit(limit).Order("created_at " + sort).Find(&products).Error
 	if err != nil {
 		return nil, err
 	}
 
 	return products, nil
+}
+
+func (p *Product) Delete(id string) error {
+	_, err := p.FindByID(id)
+	if err != nil {
+		return err
+	}
+	return p.DB.Delete(&entity.Product{}, "id = ?", id).Error
 }

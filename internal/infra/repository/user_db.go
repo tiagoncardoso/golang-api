@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"github.com/tiagoncardoso/golang-api/internal/entity"
