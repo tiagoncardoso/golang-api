@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func dbConnect() *gorm.DB {
+func dbConnectUser() *gorm.DB {
 	dsn := "file::memory:"
 
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
@@ -38,7 +38,7 @@ func createUser(db *gorm.DB, user *entity.User) (*User, error) {
 }
 
 func TestUser_Create(t *testing.T) {
-	db := dbConnect()
+	db := dbConnectUser()
 	user, _ := entity.NewUser("John Doe", "john@doe.com", "123456")
 
 	_, err := createUser(db, user)
@@ -57,7 +57,7 @@ func TestUser_Create(t *testing.T) {
 }
 
 func TestFindUserByEmail(t *testing.T) {
-	db := dbConnect()
+	db := dbConnectUser()
 
 	user, _ := entity.NewUser("John Doe", "john@doe", "123456")
 	userDb, err := createUser(db, user)
