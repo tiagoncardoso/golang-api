@@ -30,8 +30,16 @@ func initDb(dsn string) *gorm.DB {
 }
 
 func initWebServer(db *gorm.DB) {
-	controller.NewProductController(db)
-	err := http.ListenAndServe(":8000", nil)
+	mux := http.NewServeMux()
+
+	productController := controller.NewProductController(db, mux)
+	productController.InitializeRoutes()
+
+	//mux.HandleFunc("/product", func(w http.ResponseWriter, r *http.Request) {
+	//	w.Write([]byte("Hello, World!"))
+	//})
+
+	err := http.ListenAndServe(":8000", mux)
 	if err != nil {
 		slog.Error("Error on server start", "msg", err)
 	}
