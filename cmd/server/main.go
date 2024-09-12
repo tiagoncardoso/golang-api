@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/tiagoncardoso/golang-api/configs"
 	"github.com/tiagoncardoso/golang-api/internal/entity"
 	"github.com/tiagoncardoso/golang-api/internal/infra/database/sqlite_db"
@@ -30,16 +32,13 @@ func initDb(dsn string) *gorm.DB {
 }
 
 func initWebServer(db *gorm.DB) {
-	mux := http.NewServeMux()
+	router := chi.NewRouter()
 
-	productController := controller.NewProductController(db, mux)
+	router.Use(middleware.Logger)
+	productController := controller.NewProductController(db, router)
 	productController.InitializeRoutes()
 
-	//mux.HandleFunc("/product", func(w http.ResponseWriter, r *http.Request) {
-	//	w.Write([]byte("Hello, World!"))
-	//})
-
-	err := http.ListenAndServe(":8000", mux)
+	err := http.ListenAndServe(":8000", router)
 	if err != nil {
 		slog.Error("Error on server start", "msg", err)
 	}
