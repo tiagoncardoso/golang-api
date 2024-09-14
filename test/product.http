@@ -8,7 +8,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8000/product/154e2f1c-160a-4146-88b1-3e01dd4730f4
+GET http://localhost:8000/product/bf1fde6e-722a-4eef-9cc8-fc03f823f15b
 
 ###
 
