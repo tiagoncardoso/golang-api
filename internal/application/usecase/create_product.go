@@ -8,17 +8,17 @@ import (
 	"net/http"
 )
 
-type ProductHandler struct {
+type CreateProductHandler struct {
 	ProductDB interfaces.ProductInterface
 }
 
-func NewProductHandler(db interfaces.ProductInterface) *ProductHandler {
-	return &ProductHandler{
+func NewCreateProductHandler(db interfaces.ProductInterface) *CreateProductHandler {
+	return &CreateProductHandler{
 		ProductDB: db,
 	}
 }
 
-func (h *ProductHandler) Execute(r *http.Request) error {
+func (h *CreateProductHandler) Execute(r *http.Request) error {
 	var product dto.CreateProductInput
 
 	err := json.NewDecoder(r.Body).Decode(&product)
