@@ -13,6 +13,7 @@ import (
 type ProductUseCases struct {
 	CreateProduct   usecase.GeneralInterface
 	FindProductById usecase.ResponseWithData[*entity.Product]
+	FindAllProducts usecase.ResponseWithData[*[]entity.Product]
 	UpdateProduct   usecase.ResponseWithData[*entity.Product]
 	DeleteProduct   usecase.GeneralInterface
 	Multiplexer     *chi.Mux
@@ -22,12 +23,14 @@ func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	productDB := repository.NewProduct(db)
 	createProductUsecase := usecase.NewCreateProductHandler(productDB)
 	findProductById := usecase.NewFindProductHandler(productDB)
+	findAllProducts := usecase.NewFindAllProductsHandler(productDB)
 	udpateProduct := usecase.NewUpdateProductHandler(productDB)
 	deleteProduct := usecase.NewDeleteProductHandler(productDB)
 
 	return &ProductUseCases{
 		CreateProduct:   createProductUsecase,
 		FindProductById: findProductById,
+		FindAllProducts: findAllProducts,
 		UpdateProduct:   udpateProduct,
 		DeleteProduct:   deleteProduct,
 		Multiplexer:     mux,
@@ -60,6 +63,19 @@ func (p *ProductUseCases) findProduct() {
 	})
 }
 
+func (p *ProductUseCases) findAllProducts() {
+	p.Multiplexer.Get("/product", func(w http.ResponseWriter, r *http.Request) {
+		products, err := p.FindAllProducts.Execute(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(products)
+	})
+}
+
 func (p *ProductUseCases) updateProduct() {
 	p.Multiplexer.Put("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
 		product, err := p.UpdateProduct.Execute(r)
@@ -89,6 +105,7 @@ func (p *ProductUseCases) deleteProduct() {
 func (p *ProductUseCases) InitializeRoutes() {
 	p.createProduct()
 	p.findProduct()
+	p.findAllProducts()
 	p.updateProduct()
 	p.deleteProduct()
 }

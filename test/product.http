@@ -2,13 +2,17 @@ POST http://localhost:8000/product
 Content-Type: application/json
 
 {
-  "name": "Product 1",
-  "price": 100
+  "name": "Product 6410",
+  "price": 7514
 }
 
 ###
 
 GET http://localhost:8000/product/154e2f1c-160a-4146-88b1-3e01dd4730f4
+
+###
+
+GET http://localhost:8000/product?page=1&limit=3&sort=desc
 
 ###
 

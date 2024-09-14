@@ -34,8 +34,8 @@ func (p *Product) Update(product *entity.Product) error {
 	return p.DB.Save(product).Error
 }
 
-func (p *Product) FindAll(page, limit int, sort string) ([]entity.Product, error) {
-	var products []entity.Product
+func (p *Product) FindAll(page, limit int, sort string) (*[]entity.Product, error) {
+	var products *[]entity.Product
 
 	if sort == "" || (sort != "asc" && sort != "desc") {
 		sort = "asc"
