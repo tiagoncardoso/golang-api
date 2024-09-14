@@ -14,6 +14,7 @@ type ProductUseCases struct {
 	CreateProduct   usecase.GeneralInterface
 	FindProductById usecase.ResponseWithData[*entity.Product]
 	UpdateProduct   usecase.ResponseWithData[*entity.Product]
+	DeleteProduct   usecase.GeneralInterface
 	Multiplexer     *chi.Mux
 }
 
@@ -22,11 +23,13 @@ func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	createProductUsecase := usecase.NewCreateProductHandler(productDB)
 	findProductById := usecase.NewFindProductHandler(productDB)
 	udpateProduct := usecase.NewUpdateProductHandler(productDB)
+	deleteProduct := usecase.NewDeleteProductHandler(productDB)
 
 	return &ProductUseCases{
 		CreateProduct:   createProductUsecase,
 		FindProductById: findProductById,
 		UpdateProduct:   udpateProduct,
+		DeleteProduct:   deleteProduct,
 		Multiplexer:     mux,
 	}
 }
@@ -70,8 +73,22 @@ func (p *ProductUseCases) updateProduct() {
 	})
 }
 
+func (p *ProductUseCases) deleteProduct() {
+	p.Multiplexer.Delete("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
+		err := p.DeleteProduct.Execute(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Product deleted"))
+	})
+}
+
 func (p *ProductUseCases) InitializeRoutes() {
 	p.createProduct()
 	p.findProduct()
 	p.updateProduct()
+	p.deleteProduct()
 }
