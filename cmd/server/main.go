@@ -36,7 +36,10 @@ func initWebServer(db *gorm.DB) {
 
 	router.Use(middleware.Logger)
 	productController := controller.NewProductController(db, router)
-	productController.InitializeRoutes()
+	productController.Register()
+
+	userController := controller.NewUserController(db, router)
+	userController.Register()
 
 	err := http.ListenAndServe(":8000", router)
 	if err != nil {

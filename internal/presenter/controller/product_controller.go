@@ -103,7 +103,7 @@ func (p *ProductUseCases) deleteProduct() {
 	})
 }
 
-func (p *ProductUseCases) InitializeRoutes() {
+func (p *ProductUseCases) Register() {
 	p.createProduct()
 	p.findProduct()
 	p.findAllProducts()
