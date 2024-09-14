@@ -1,25 +1,33 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/go-chi/chi"
 	"github.com/tiagoncardoso/golang-api/internal/application/usecase"
+	"github.com/tiagoncardoso/golang-api/internal/entity"
 	"github.com/tiagoncardoso/golang-api/internal/infra/repository"
 	"gorm.io/gorm"
 	"net/http"
 )
 
 type ProductUseCases struct {
-	CreateProduct usecase.GeneralInterface
-	Multiplexer   *chi.Mux
+	CreateProduct   usecase.GeneralInterface
+	FindProductById usecase.ResponseWithData[*entity.Product]
+	UpdateProduct   usecase.ResponseWithData[*entity.Product]
+	Multiplexer     *chi.Mux
 }
 
 func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	productDB := repository.NewProduct(db)
-	createProductUsecase := usecase.NewProductHandler(productDB)
+	createProductUsecase := usecase.NewCreateProductHandler(productDB)
+	findProductById := usecase.NewFindProductHandler(productDB)
+	udpateProduct := usecase.NewUpdateProductHandler(productDB)
 
 	return &ProductUseCases{
-		CreateProduct: createProductUsecase,
-		Multiplexer:   mux,
+		CreateProduct:   createProductUsecase,
+		FindProductById: findProductById,
+		UpdateProduct:   udpateProduct,
+		Multiplexer:     mux,
 	}
 }
 
@@ -36,6 +44,34 @@ func (p *ProductUseCases) createProduct() {
 	})
 }
 
+func (p *ProductUseCases) findProduct() {
+	p.Multiplexer.Get("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
+		product, err := p.FindProductById.Execute(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(product)
+	})
+}
+
+func (p *ProductUseCases) updateProduct() {
+	p.Multiplexer.Put("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
+		product, err := p.UpdateProduct.Execute(r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(product)
+	})
+}
+
 func (p *ProductUseCases) InitializeRoutes() {
 	p.createProduct()
+	p.findProduct()
+	p.updateProduct()
 }
