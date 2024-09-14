@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi"
 	"github.com/tiagoncardoso/golang-api/internal/application/usecase"
+	"github.com/tiagoncardoso/golang-api/internal/application/usecase/product"
 	"github.com/tiagoncardoso/golang-api/internal/entity"
 	"github.com/tiagoncardoso/golang-api/internal/infra/repository"
 	"gorm.io/gorm"
@@ -21,11 +22,11 @@ type ProductUseCases struct {
 
 func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	productDB := repository.NewProduct(db)
-	createProductUsecase := usecase.NewCreateProductHandler(productDB)
-	findProductById := usecase.NewFindProductHandler(productDB)
-	findAllProducts := usecase.NewFindAllProductsHandler(productDB)
-	udpateProduct := usecase.NewUpdateProductHandler(productDB)
-	deleteProduct := usecase.NewDeleteProductHandler(productDB)
+	createProductUsecase := product.NewCreateProductHandler(productDB)
+	findProductById := product.NewFindProductHandler(productDB)
+	findAllProducts := product.NewFindAllProductsHandler(productDB)
+	udpateProduct := product.NewUpdateProductHandler(productDB)
+	deleteProduct := product.NewDeleteProductHandler(productDB)
 
 	return &ProductUseCases{
 		CreateProduct:   createProductUsecase,

@@ -1,7 +1,6 @@
-package usecase
+package product
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/go-chi/chi"
 	"github.com/tiagoncardoso/golang-api/internal/entity"
@@ -10,19 +9,18 @@ import (
 	"net/http"
 )
 
-type UpdateProductHandler struct {
+type FindProductByIdHandler struct {
 	ProductDB interfaces.ProductInterface
 }
 
-func NewUpdateProductHandler(db interfaces.ProductInterface) *UpdateProductHandler {
-	return &UpdateProductHandler{
+func NewFindProductHandler(db interfaces.ProductInterface) *FindProductByIdHandler {
+	return &FindProductByIdHandler{
 		ProductDB: db,
 	}
 }
 
-func (h *UpdateProductHandler) Execute(r *http.Request) (*entity.Product, error) {
+func (h *FindProductByIdHandler) Execute(r *http.Request) (*entity.Product, error) {
 	var product *entity.Product
-	var tmpProduct *entity.Product
 
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -39,16 +37,5 @@ func (h *UpdateProductHandler) Execute(r *http.Request) (*entity.Product, error)
 		return product, err
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&tmpProduct)
-	if err != nil {
-		return product, err
-	}
-
-	tmpProduct.ID = product.ID
-	err = h.ProductDB.Update(tmpProduct)
-	if err != nil {
-		return product, err
-	}
-
-	return tmpProduct, nil
+	return product, nil
 }
