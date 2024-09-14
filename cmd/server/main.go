@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/jwtauth"
 	"github.com/tiagoncardoso/golang-api/configs"
 	"github.com/tiagoncardoso/golang-api/internal/entity"
 	"github.com/tiagoncardoso/golang-api/internal/infra/database/sqlite_db"
@@ -16,7 +17,7 @@ func main() {
 	config, _ := configs.LoadConfig(".")
 
 	db := initDb(config.DBHost)
-	initWebServer(db)
+	initWebServer(db, config.JWTTokenAuth, config.JWTTExpiresIn)
 }
 
 func initDb(dsn string) *gorm.DB {
@@ -31,14 +32,14 @@ func initDb(dsn string) *gorm.DB {
 	return db
 }
 
-func initWebServer(db *gorm.DB) {
+func initWebServer(db *gorm.DB, jwt *jwtauth.JWTAuth, jwtExpiresIn int) {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
 	productController := controller.NewProductController(db, router)
 	productController.Register()
 
-	userController := controller.NewUserController(db, router)
+	userController := controller.NewUserController(db, router, jwt, jwtExpiresIn)
 	userController.Register()
 
 	err := http.ListenAndServe(":8000", router)
