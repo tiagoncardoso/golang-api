@@ -6,3 +6,13 @@ Content-Type: application/json
   "email": "jonhdodo@jojo.com",
   "password": "123456"
 }
+
+###
+
+POST localhost:8000/user/getToken
+Content-Type: application/json
+
+{
+  "email": "jonhdodo@jojo.com",
+  "password": "123456"
+}
