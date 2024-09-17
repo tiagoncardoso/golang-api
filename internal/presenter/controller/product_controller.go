@@ -22,7 +22,7 @@ type ProductUseCases struct {
 
 func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	productDB := repository.NewProduct(db)
-	createProductUsecase := product.NewCreateProductHandler(productDB)
+	createProductUsecase := product.NewCreateProductUsecase(productDB)
 	findProductById := product.NewFindProductHandler(productDB)
 	findAllProducts := product.NewFindAllProductsHandler(productDB)
 	udpateProduct := product.NewUpdateProductHandler(productDB)
@@ -38,75 +38,67 @@ func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	}
 }
 
-func (p *ProductUseCases) createProduct() {
-	p.Multiplexer.Post("/product", func(w http.ResponseWriter, r *http.Request) {
-		err := p.CreateProduct.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-		}
+func (p *ProductUseCases) createProductHandler(w http.ResponseWriter, r *http.Request) {
+	err := p.CreateProduct.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("Product created"))
-	})
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Product created"))
 }
 
-func (p *ProductUseCases) findProduct() {
-	p.Multiplexer.Get("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
-		product, err := p.FindProductById.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-		}
+func (p *ProductUseCases) findProductHandler(w http.ResponseWriter, r *http.Request) {
+	prd, err := p.FindProductById.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(product)
-	})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(prd)
 }
 
-func (p *ProductUseCases) findAllProducts() {
-	p.Multiplexer.Get("/product", func(w http.ResponseWriter, r *http.Request) {
-		products, err := p.FindAllProducts.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-		}
+func (p *ProductUseCases) findAllProductsHandler(w http.ResponseWriter, r *http.Request) {
+	products, err := p.FindAllProducts.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(products)
-	})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(products)
 }
 
-func (p *ProductUseCases) updateProduct() {
-	p.Multiplexer.Put("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
-		product, err := p.UpdateProduct.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-		}
+func (p *ProductUseCases) updateProductHandler(w http.ResponseWriter, r *http.Request) {
+	prd, err := p.UpdateProduct.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(product)
-	})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(prd)
 }
 
-func (p *ProductUseCases) deleteProduct() {
-	p.Multiplexer.Delete("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
-		err := p.DeleteProduct.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-		}
+func (p *ProductUseCases) deleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	err := p.DeleteProduct.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Product deleted"))
-	})
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Product deleted"))
 }
 
 func (p *ProductUseCases) Register() {
-	p.createProduct()
-	p.findProduct()
-	p.findAllProducts()
-	p.updateProduct()
-	p.deleteProduct()
+	p.Multiplexer.Route("/product", func(r chi.Router) {
+		r.Post("/", p.createProductHandler)
+		r.Get("/{id}", p.findProductHandler)
+		r.Get("/product", p.findAllProductsHandler)
+		r.Put("/product/{id}", p.updateProductHandler)
+		r.Delete("/product/{id}", p.deleteProductHandler)
+	})
 }
