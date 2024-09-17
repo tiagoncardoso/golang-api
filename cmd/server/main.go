@@ -37,7 +37,7 @@ func initWebServer(db *gorm.DB, jwt *jwtauth.JWTAuth, jwtExpiresIn int) {
 
 	router.Use(middleware.Logger)
 	productController := controller.NewProductController(db, router)
-	productController.Register()
+	productController.Register(jwt)
 
 	userController := controller.NewUserController(db, router, jwt, jwtExpiresIn)
 	userController.Register()

@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/jwtauth"
 	"github.com/tiagoncardoso/golang-api/internal/application/usecase"
 	"github.com/tiagoncardoso/golang-api/internal/application/usecase/product"
 	"github.com/tiagoncardoso/golang-api/internal/entity"
@@ -93,8 +94,11 @@ func (p *ProductUseCases) deleteProductHandler(w http.ResponseWriter, r *http.Re
 	w.Write([]byte("Product deleted"))
 }
 
-func (p *ProductUseCases) Register() {
+func (p *ProductUseCases) Register(jwt *jwtauth.JWTAuth) {
 	p.Multiplexer.Route("/product", func(r chi.Router) {
+		r.Use(jwtauth.Verifier(jwt))
+		r.Use(jwtauth.Authenticator)
+
 		r.Post("/", p.createProductHandler)
 		r.Get("/{id}", p.findProductHandler)
 		r.Get("/product", p.findAllProductsHandler)
