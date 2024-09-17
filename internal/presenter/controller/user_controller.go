@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/jwtauth"
 	"github.com/tiagoncardoso/golang-api/internal/application/dto"
 	"github.com/tiagoncardoso/golang-api/internal/application/usecase"
 	"github.com/tiagoncardoso/golang-api/internal/application/usecase/user"
@@ -18,10 +17,10 @@ type UserUseCases struct {
 	Multiplexer *chi.Mux
 }
 
-func NewUserController(db *gorm.DB, mux *chi.Mux, jwt *jwtauth.JWTAuth, jwtExpiresIn int) *UserUseCases {
+func NewUserController(db *gorm.DB, mux *chi.Mux) *UserUseCases {
 	userDB := repository.NewUser(db)
 	createUser := user.NewCreateUserUsecase(userDB)
-	genJwtToken := user.NewCreateJwtTokenUsecase(userDB, jwt, jwtExpiresIn)
+	genJwtToken := user.NewCreateJwtTokenUsecase(userDB)
 
 	return &UserUseCases{
 		CreateUser:  createUser,

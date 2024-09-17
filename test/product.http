@@ -1,6 +1,6 @@
 POST http://localhost:8000/product
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjY2MTc3MDIsImlkIjoiY2U3YTc1ZDYtMGU0My00ZmY1LThkZjUtNjcwMjZiOWQwM2FhIn0.nRm9ILZ4AhisqRfgYTEhg6WFR-nt68fwslVcWbm8MI0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjY2MTk4OTYsImlkIjoiY2U3YTc1ZDYtMGU0My00ZmY1LThkZjUtNjcwMjZiOWQwM2FhIn0.2TkyYDLidvCJH9qRuRxuTusAiUHrb_D9-2DNnxfoxik
 
 {
   "name": "Product 235",

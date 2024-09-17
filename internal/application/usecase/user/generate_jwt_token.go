@@ -11,20 +11,19 @@ import (
 )
 
 type CreateJwtTokenUsecase struct {
-	UserDB       interfaces.UserInterface
-	Jwt          *jwtauth.JWTAuth
-	JwtExpiresIn int
+	UserDB interfaces.UserInterface
 }
 
-func NewCreateJwtTokenUsecase(db interfaces.UserInterface, jwt *jwtauth.JWTAuth, jwtExpiresIn int) *CreateJwtTokenUsecase {
+func NewCreateJwtTokenUsecase(db interfaces.UserInterface) *CreateJwtTokenUsecase {
 	return &CreateJwtTokenUsecase{
-		UserDB:       db,
-		Jwt:          jwt,
-		JwtExpiresIn: jwtExpiresIn,
+		UserDB: db,
 	}
 }
 
 func (t *CreateJwtTokenUsecase) Execute(r *http.Request) (dto.JwtToken, error) {
+	jwt := r.Context().Value("jwt").(*jwtauth.JWTAuth)
+	jwtExpiresIn := r.Context().Value("jwtExpiresIn").(int)
+
 	var user dto.GenerateTokenInput
 	var token dto.JwtToken
 
@@ -42,9 +41,9 @@ func (t *CreateJwtTokenUsecase) Execute(r *http.Request) (dto.JwtToken, error) {
 		return token, errors.New("invalid password")
 	}
 
-	_, tokenString, err := t.Jwt.Encode(map[string]interface{}{
+	_, tokenString, err := jwt.Encode(map[string]interface{}{
 		"id":  u.ID,
-		"exp": time.Now().Add(time.Duration(t.JwtExpiresIn) * time.Second).Unix(),
+		"exp": time.Now().Add(time.Duration(jwtExpiresIn) * time.Second).Unix(),
 	})
 
 	token.AccessToken = tokenString
