@@ -13,9 +13,9 @@ import (
 )
 
 type UserUseCases struct {
-	CreateUserHandler  usecase.GeneralInterface
-	GenJwtTokenHandler usecase.ResponseWithData[dto.JwtToken]
-	Multiplexer        *chi.Mux
+	CreateUser  usecase.GeneralInterface
+	GenJwtToken usecase.ResponseWithData[dto.JwtToken]
+	Multiplexer *chi.Mux
 }
 
 func NewUserController(db *gorm.DB, mux *chi.Mux, jwt *jwtauth.JWTAuth, jwtExpiresIn int) *UserUseCases {
@@ -24,39 +24,37 @@ func NewUserController(db *gorm.DB, mux *chi.Mux, jwt *jwtauth.JWTAuth, jwtExpir
 	genJwtToken := user.NewCreateJwtTokenUsecase(userDB, jwt, jwtExpiresIn)
 
 	return &UserUseCases{
-		CreateUserHandler:  createUser,
-		GenJwtTokenHandler: genJwtToken,
-		Multiplexer:        mux,
+		CreateUser:  createUser,
+		GenJwtToken: genJwtToken,
+		Multiplexer: mux,
 	}
 }
 
-func (u *UserUseCases) createUser() {
-	u.Multiplexer.Post("/user", func(w http.ResponseWriter, r *http.Request) {
-		err := u.CreateUserHandler.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-		}
+func (u *UserUseCases) createUserHandler(w http.ResponseWriter, r *http.Request) {
+	err := u.CreateUser.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("User created"))
-	})
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("User created"))
 }
 
-func (u *UserUseCases) genAccessToken() {
-	u.Multiplexer.Post("/user/getToken", func(w http.ResponseWriter, r *http.Request) {
-		jwtToken, err := u.GenJwtTokenHandler.Execute(r)
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(err.Error()))
-		}
+func (u *UserUseCases) genAccessTokenHandler(w http.ResponseWriter, r *http.Request) {
+	jwtToken, err := u.GenJwtToken.Execute(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(err.Error()))
+	}
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(jwtToken)
-	})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(jwtToken)
 }
 
 func (u *UserUseCases) Register() {
-	u.createUser()
-	u.genAccessToken()
+	u.Multiplexer.Route("/user", func(r chi.Router) {
+		r.Post("/", u.createUserHandler)
+		r.Post("/getToken", u.genAccessTokenHandler)
+	})
 }
