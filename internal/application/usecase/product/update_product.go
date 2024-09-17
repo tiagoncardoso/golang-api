@@ -10,17 +10,17 @@ import (
 	"net/http"
 )
 
-type UpdateProductHandler struct {
+type UpdateProductUsecase struct {
 	ProductDB interfaces.ProductInterface
 }
 
-func NewUpdateProductHandler(db interfaces.ProductInterface) *UpdateProductHandler {
-	return &UpdateProductHandler{
+func NewUpdateProductUsecase(db interfaces.ProductInterface) *UpdateProductUsecase {
+	return &UpdateProductUsecase{
 		ProductDB: db,
 	}
 }
 
-func (h *UpdateProductHandler) Execute(r *http.Request) (*entity.Product, error) {
+func (h *UpdateProductUsecase) Execute(r *http.Request) (*entity.Product, error) {
 	var product *entity.Product
 	var tmpProduct *entity.Product
 

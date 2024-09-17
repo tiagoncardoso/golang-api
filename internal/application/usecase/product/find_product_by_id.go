@@ -9,17 +9,17 @@ import (
 	"net/http"
 )
 
-type FindProductByIdHandler struct {
+type FindProductByIdUsecase struct {
 	ProductDB interfaces.ProductInterface
 }
 
-func NewFindProductHandler(db interfaces.ProductInterface) *FindProductByIdHandler {
-	return &FindProductByIdHandler{
+func NewFindProductByIdUsecase(db interfaces.ProductInterface) *FindProductByIdUsecase {
+	return &FindProductByIdUsecase{
 		ProductDB: db,
 	}
 }
 
-func (h *FindProductByIdHandler) Execute(r *http.Request) (*entity.Product, error) {
+func (h *FindProductByIdUsecase) Execute(r *http.Request) (*entity.Product, error) {
 	var product *entity.Product
 
 	id := chi.URLParam(r, "id")

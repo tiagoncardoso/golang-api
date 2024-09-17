@@ -24,10 +24,10 @@ type ProductUseCases struct {
 func NewProductController(db *gorm.DB, mux *chi.Mux) *ProductUseCases {
 	productDB := repository.NewProduct(db)
 	createProductUsecase := product.NewCreateProductUsecase(productDB)
-	findProductById := product.NewFindProductHandler(productDB)
-	findAllProducts := product.NewFindAllProductsHandler(productDB)
-	udpateProduct := product.NewUpdateProductHandler(productDB)
-	deleteProduct := product.NewDeleteProductHandler(productDB)
+	findProductById := product.NewFindProductByIdUsecase(productDB)
+	findAllProducts := product.NewFindAllProductsUsecase(productDB)
+	udpateProduct := product.NewUpdateProductUsecase(productDB)
+	deleteProduct := product.NewDeleteProductUsecase(productDB)
 
 	return &ProductUseCases{
 		CreateProduct:   createProductUsecase,

@@ -8,17 +8,17 @@ import (
 	"strconv"
 )
 
-type FindAllProductHandler struct {
+type FindAllProductUsecase struct {
 	ProductDB interfaces.ProductInterface
 }
 
-func NewFindAllProductsHandler(db interfaces.ProductInterface) *FindAllProductHandler {
-	return &FindAllProductHandler{
+func NewFindAllProductsUsecase(db interfaces.ProductInterface) *FindAllProductUsecase {
+	return &FindAllProductUsecase{
 		ProductDB: db,
 	}
 }
 
-func (h *FindAllProductHandler) Execute(r *http.Request) (*[]entity.Product, error) {
+func (h *FindAllProductUsecase) Execute(r *http.Request) (*[]entity.Product, error) {
 	var products *[]entity.Product
 
 	page := r.URL.Query().Get("page")

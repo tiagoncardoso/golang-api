@@ -9,17 +9,17 @@ import (
 	"net/http"
 )
 
-type DeleteProductHandler struct {
+type DeleteProductUsecase struct {
 	ProductDB interfaces.ProductInterface
 }
 
-func NewDeleteProductHandler(db interfaces.ProductInterface) *DeleteProductHandler {
-	return &DeleteProductHandler{
+func NewDeleteProductUsecase(db interfaces.ProductInterface) *DeleteProductUsecase {
+	return &DeleteProductUsecase{
 		ProductDB: db,
 	}
 }
 
-func (h *DeleteProductHandler) Execute(r *http.Request) error {
+func (h *DeleteProductUsecase) Execute(r *http.Request) error {
 	var product *entity.Product
 
 	id := chi.URLParam(r, "id")
