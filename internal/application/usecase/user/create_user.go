@@ -8,17 +8,17 @@ import (
 	"net/http"
 )
 
-type CreateUserHandler struct {
+type CreateUserUsecase struct {
 	UserDB interfaces.UserInterface
 }
 
-func NewCreateUserHandler(db interfaces.UserInterface) *CreateUserHandler {
-	return &CreateUserHandler{
+func NewCreateUserUsecase(db interfaces.UserInterface) *CreateUserUsecase {
+	return &CreateUserUsecase{
 		UserDB: db,
 	}
 }
 
-func (h *CreateUserHandler) Execute(r *http.Request) error {
+func (h *CreateUserUsecase) Execute(r *http.Request) error {
 	var user dto.CreateUserInput
 
 	err := json.NewDecoder(r.Body).Decode(&user)

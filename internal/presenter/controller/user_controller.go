@@ -20,8 +20,8 @@ type UserUseCases struct {
 
 func NewUserController(db *gorm.DB, mux *chi.Mux, jwt *jwtauth.JWTAuth, jwtExpiresIn int) *UserUseCases {
 	userDB := repository.NewUser(db)
-	createUser := user.NewCreateUserHandler(userDB)
-	genJwtToken := user.NewCreateJwtTokenHandler(userDB, jwt, jwtExpiresIn)
+	createUser := user.NewCreateUserUsecase(userDB)
+	genJwtToken := user.NewCreateJwtTokenUsecase(userDB, jwt, jwtExpiresIn)
 
 	return &UserUseCases{
 		CreateUserHandler:  createUser,

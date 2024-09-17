@@ -10,21 +10,21 @@ import (
 	"time"
 )
 
-type CreateJwtTokenHandler struct {
+type CreateJwtTokenUsecase struct {
 	UserDB       interfaces.UserInterface
 	Jwt          *jwtauth.JWTAuth
 	JwtExpiresIn int
 }
 
-func NewCreateJwtTokenHandler(db interfaces.UserInterface, jwt *jwtauth.JWTAuth, jwtExpiresIn int) *CreateJwtTokenHandler {
-	return &CreateJwtTokenHandler{
+func NewCreateJwtTokenUsecase(db interfaces.UserInterface, jwt *jwtauth.JWTAuth, jwtExpiresIn int) *CreateJwtTokenUsecase {
+	return &CreateJwtTokenUsecase{
 		UserDB:       db,
 		Jwt:          jwt,
 		JwtExpiresIn: jwtExpiresIn,
 	}
 }
 
-func (t *CreateJwtTokenHandler) Execute(r *http.Request) (dto.JwtToken, error) {
+func (t *CreateJwtTokenUsecase) Execute(r *http.Request) (dto.JwtToken, error) {
 	var user dto.GenerateTokenInput
 	var token dto.JwtToken
 
