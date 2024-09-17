@@ -36,6 +36,8 @@ func initWebServer(db *gorm.DB, jwt *jwtauth.JWTAuth, jwtExpiresIn int) {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
+	//router.Use(middleware.LogRequest) // This is my middleware
+
 	productController := controller.NewProductController(db, router)
 	productController.Register(jwt)
 
