@@ -17,6 +17,10 @@ type UserUseCases struct {
 	Multiplexer *chi.Mux
 }
 
+type Error struct {
+	Message string `json:"message"`
+}
+
 func NewUserController(db *gorm.DB, mux *chi.Mux) *UserUseCases {
 	userDB := repository.NewUser(db)
 	createUser := user.NewCreateUserUsecase(userDB)
@@ -29,22 +33,48 @@ func NewUserController(db *gorm.DB, mux *chi.Mux) *UserUseCases {
 	}
 }
 
+// Create user godoc
+// @Summary Create user
+// @Description Create a new user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateUserInput true "user request"
+// @Success 201 {string} string "User created"
+// @Failure 500 {string} {object} Error
+// @Router /user [post]
 func (u *UserUseCases) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	err := u.CreateUser.Execute(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		err := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(err)
+
+		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User created"))
 }
 
+// Generate access token godoc
+// @Summary Generate access token
+// @Description Generate a new access token
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param request body dto.GenerateTokenInput true "user credentials"
+// @Success 200 {object} dto.JwtToken
+// @Failure 401 {string} {object} Error
+// @Router /user/getToken [post]
 func (u *UserUseCases) genAccessTokenHandler(w http.ResponseWriter, r *http.Request) {
 	jwtToken, err := u.GenJwtToken.Execute(r)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(err.Error()))
+		err := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(err)
+
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

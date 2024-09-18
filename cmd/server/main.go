@@ -4,7 +4,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/tiagoncardoso/golang-api/configs"
+	_ "github.com/tiagoncardoso/golang-api/docs"
 	"github.com/tiagoncardoso/golang-api/internal/entity"
 	"github.com/tiagoncardoso/golang-api/internal/infra/database/sqlite_db"
 	"github.com/tiagoncardoso/golang-api/internal/presenter/controller"
@@ -13,6 +15,18 @@ import (
 	"net/http"
 )
 
+// @title Golang API
+// @version 1.0
+// @description This is a simple API to manage products and users
+
+// @contact.name Tiago Cardoso
+// @contact.email tiago.mncardoso@gmail.com
+
+// @host localhost:8000
+// @BasePath /
+// @securityDefinitions.jwt Bearer
+// @in header
+// @name Authorization
 func main() {
 	config, _ := configs.LoadConfig(".")
 
@@ -46,6 +60,8 @@ func initWebServer(db *gorm.DB, jwt *jwtauth.JWTAuth, jwtExpiresIn int) {
 
 	userController := controller.NewUserController(db, router)
 	userController.Register()
+
+	router.Get("/api/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8000/api/doc.json")))
 
 	err := http.ListenAndServe(":8000", router)
 	if err != nil {

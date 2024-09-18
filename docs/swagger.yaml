@@ -1,0 +1,85 @@
+basePath: /
+definitions:
+  dto.CreateUserInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.GenerateTokenInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.JwtToken:
+    properties:
+      access_token:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: tiago.mncardoso@gmail.com
+    name: Tiago Cardoso
+  description: This is a simple API to manage products and users
+  title: Golang API
+  version: "1.0"
+paths:
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create user
+      tags:
+      - user
+  /user/getToken:
+    post:
+      consumes:
+      - application/json
+      description: Generate a new access token
+      parameters:
+      - description: user credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GenerateTokenInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.JwtToken'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Generate access token
+      tags:
+      - user
+swagger: "2.0"
